@@ -63,6 +63,11 @@
             font-size: 1.1em;
             margin-bottom: 10px;
         }
+
+        /* New styles for the search bar */
+        .search-bar {
+            max-width: 700px; /* Adjust the width as needed */
+        }
     </style>
 </head>
 <body>
@@ -90,6 +95,18 @@
             <a href="{{ route('products.create') }}" class="btn btn-primary">Create New Product</a>
         </div>
 
+        <!-- Search Bar with Clear Button -->
+        <form action="{{ route('products.index') }}" method="GET" class="mb-3">
+            <div class="input-group search-bar mx-auto"> <!-- Added class for search bar -->
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search for products..." 
+                       aria-label="Search for products" 
+                       value="{{ request('search') }}"> <!-- Retain the search value -->
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+                <a href="{{ route('products.index') }}" class="btn btn-danger">Clear</a> <!-- Clear button -->
+            </div>
+        </form>
+
         <div class="product-wrapper">
             @foreach($products as $product)
                 <div class="product-card">
@@ -100,6 +117,13 @@
                     </div>
                     <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning btn-sm">Edit</a>
                     <button class="btn btn-primary btn-sm btn-purchase">Purchase</button>
+
+                    <!-- Delete Button Form -->
+                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="mt-2">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?')">Delete</button>
+                    </form>
                 </div>
             @endforeach
         </div>
