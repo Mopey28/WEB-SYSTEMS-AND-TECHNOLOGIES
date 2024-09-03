@@ -8,9 +8,16 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request) // Updated method signature
     {
-        $products = Product::all();
+        $search = $request->get('search');
+
+        if ($search) {
+            $products = Product::where('product_name', 'like', "%{$search}%")->get();
+        } else {
+            $products = Product::all();
+        }
+
         return view('products.index', compact('products'));
     }
 
@@ -79,5 +86,20 @@ class ProductController extends Controller
         $product->save();
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+
+        // Delete the associated image from storage
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        // Delete the product from the database
+        $product->delete();
+
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
 }
